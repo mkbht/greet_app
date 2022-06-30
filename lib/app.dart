@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:greet_app/bindings/bindings.dart';
+import 'package:greet_app/screens/dashboard.dart';
+import 'package:greet_app/screens/edit_profile.dart';
+import 'package:greet_app/screens/forgot_password.dart';
 import 'package:greet_app/screens/login.dart';
+import 'package:greet_app/screens/profile.dart';
 import 'package:greet_app/screens/register.dart';
 
 class App extends StatelessWidget {
@@ -8,19 +14,22 @@ class App extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'Greet',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.indigo,
       ),
+      initialBinding: GetxBindings(),
       initialRoute: '/login',
-      routes: {
-        // When navigating to the "/" route, build the FirstScreen widget.
-        '/login': (context) => const LoginScreen(),
-        // When navigating to the "/second" route, build the SecondScreen widget.
-        '/register': (context) => const RegisterScreen(),
-      },
+      getPages: [
+        GetPage(name: "/login", page: () => LoginScreen()),
+        GetPage(name: "/register", page: () => RegisterScreen()),
+        GetPage(name: "/dashboard", page: () => DashboardScreen()),
+        GetPage(name: "/forgotPassword", page: () => ForgotPasswordScreen()),
+        GetPage(name: "/profile", page: () => ProfileScreen()),
+        GetPage(name: "/editProfile", page: () => EditProfileScreen()),
+      ],
     );
   }
 }

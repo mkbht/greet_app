@@ -1,14 +1,54 @@
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:greet_app/controllers/login_controller.dart';
+import 'dart:convert';
 
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+class ForgotPasswordScreen extends StatefulWidget {
+  const ForgotPasswordScreen({super.key});
+
+  @override
+  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+}
+
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+  final emailController = TextEditingController();
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    super.dispose();
+  }
+
+  Future _forgot(email, context) async {
+    final response = await http.post(
+      Uri.parse('http://192.168.2.15:3333/api/forgotPassword'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{'email': email}),
+    );
+
+    if (response.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(jsonDecode(response.body)['message']),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(jsonDecode(response.body)['message']),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    LoginController loginController = Get.find<LoginController>();
-
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -26,29 +66,18 @@ class LoginScreen extends StatelessWidget {
             ),
             Center(
               child: Text(
-                "Log In",
+                "Forgot Password",
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
               child: TextFormField(
-                controller: loginController.username,
+                controller: emailController,
                 decoration: const InputDecoration(
                     border: OutlineInputBorder(),
-                    labelText: "Username or Email",
-                    prefixIcon: Icon(Icons.account_circle)),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-              child: TextFormField(
-                controller: loginController.password,
-                obscureText: true,
-                decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: "Password",
-                    prefixIcon: Icon(Icons.lock)),
+                    labelText: "Email",
+                    prefixIcon: Icon(Icons.email)),
               ),
             ),
             Padding(
@@ -57,35 +86,25 @@ class LoginScreen extends StatelessWidget {
                 height: 48,
                 child: ElevatedButton(
                   onPressed: () {
-                    loginController.login();
+                    _forgot(emailController.text, context);
                   },
-                  child: const Text("Login"),
+                  child: const Text("Forgot Password"),
                 ),
               ),
             ),
-            Center(child: Text("New user?")),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
               child: SizedBox(
                 height: 48,
                 child: OutlinedButton(
                   onPressed: () {
-                    Get.toNamed('/register');
+                    Navigator.pushNamed(context, '/login');
                   },
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(color: Theme.of(context).primaryColor),
                   ),
-                  child: Text("Create an account"),
+                  child: Text("Login"),
                 ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-              child: TextButton(
-                onPressed: () {
-                  Get.toNamed('/forgotPassword');
-                },
-                child: Text("Forgot Password?"),
               ),
             ),
           ],

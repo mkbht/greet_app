@@ -1,0 +1,14 @@
+import 'package:get/get.dart';
+import 'package:greet_app/controllers/login_controller.dart';
+import 'package:greet_app/controllers/main_menu_controller.dart';
+import 'package:greet_app/controllers/profile_controller.dart';
+
+class GetxBindings implements Bindings {
+// default dependency
+  @override
+  void dependencies() {
+    Get.lazyPut<LoginController>(() => LoginController());
+    Get.lazyPut<MainMenuController>(() => MainMenuController(), fenix: true);
+    Get.lazyPut<ProfileController>(() => ProfileController(), fenix: true);
+  }
+}

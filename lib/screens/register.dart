@@ -1,7 +1,78 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
-class RegisterScreen extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+
+class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
+
+  @override
+  State<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
+  final usernameController = TextEditingController();
+  final passwordController = TextEditingController();
+  final emailController = TextEditingController();
+  final firstNameController = TextEditingController();
+  final lastNameController = TextEditingController();
+
+  Future _register(
+      context, username, password, email, firstName, lastName) async {
+    if (username == "" ||
+        password == "" ||
+        email == "" ||
+        firstName == "" ||
+        lastName == "") {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Please fill up all the fields."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } else {
+      try {
+        final response = await http.post(
+          Uri.parse('http://192.168.2.15:3333/api/register'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(<String, String>{
+            'username': username,
+            'password': password,
+            'email': email,
+            'first_name': firstName,
+            'last_name': lastName,
+          }),
+        );
+
+        if (response.statusCode == 200) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(jsonDecode(response.body)['message']),
+              backgroundColor: Colors.green,
+            ),
+          );
+          Get.toNamed('/login');
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(jsonDecode(response.body)['message']),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } on Exception catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Failed to connect with server."),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +91,7 @@ class RegisterScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
               child: TextFormField(
+                controller: usernameController,
                 decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: "Username",
@@ -29,6 +101,7 @@ class RegisterScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
               child: TextFormField(
+                controller: passwordController,
                 obscureText: true,
                 decoration: const InputDecoration(
                     border: OutlineInputBorder(),
@@ -39,6 +112,7 @@ class RegisterScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
               child: TextFormField(
+                controller: emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: const InputDecoration(
                     border: OutlineInputBorder(),
@@ -49,6 +123,7 @@ class RegisterScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
               child: TextFormField(
+                controller: firstNameController,
                 decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: "First Name",
@@ -58,6 +133,7 @@ class RegisterScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
               child: TextFormField(
+                controller: lastNameController,
                 decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: "Last Name",
@@ -69,7 +145,15 @@ class RegisterScreen extends StatelessWidget {
               child: SizedBox(
                 height: 48,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    _register(
+                        context,
+                        usernameController.text,
+                        passwordController.text,
+                        emailController.text,
+                        firstNameController.text,
+                        lastNameController.text);
+                  },
                   child: const Text("Register"),
                 ),
               ),
@@ -81,7 +165,7 @@ class RegisterScreen extends StatelessWidget {
                 height: 48,
                 child: OutlinedButton(
                   onPressed: () {
-                    Navigator.pop(context);
+                    Get.toNamed('/login');
                   },
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(color: Theme.of(context).primaryColor),
