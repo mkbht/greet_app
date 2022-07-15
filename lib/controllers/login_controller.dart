@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
@@ -11,6 +12,7 @@ import '../models/Login.dart';
 class LoginController extends GetxController {
   final username = TextEditingController();
   final password = TextEditingController();
+  final isLoading = false.obs;
   final storage = GetStorage();
 
   @override
@@ -21,9 +23,11 @@ class LoginController extends GetxController {
   }
 
   Future login() async {
+    print("Login button hit");
     try {
+      isLoading.value = true;
       final response = await http.post(
-        Uri.parse('http://192.168.2.15:3333/api/login'),
+        Uri.parse('${dotenv.env['API_URL']}/login'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -64,8 +68,7 @@ class LoginController extends GetxController {
           backgroundColor: Colors.red,
         );
       }
-    } on Exception catch (e) {
-      print(e);
+    } on Exception {
       Get.snackbar(
         "Error",
         "Could not connect to server.",
@@ -76,6 +79,8 @@ class LoginController extends GetxController {
         colorText: Colors.white,
         backgroundColor: Colors.red,
       );
+    } finally {
+      isLoading.value = false;
     }
   }
 }

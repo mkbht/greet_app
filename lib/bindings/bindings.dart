@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:greet_app/controllers/login_controller.dart';
 import 'package:greet_app/controllers/main_menu_controller.dart';
+import 'package:greet_app/controllers/privatechat_controller.dart';
 import 'package:greet_app/controllers/profile_controller.dart';
 
 class GetxBindings implements Bindings {
@@ -10,5 +11,7 @@ class GetxBindings implements Bindings {
     Get.lazyPut<LoginController>(() => LoginController());
     Get.lazyPut<MainMenuController>(() => MainMenuController(), fenix: true);
     Get.lazyPut<ProfileController>(() => ProfileController(), fenix: true);
+    Get.lazyPut<PrivatechatController>(() => PrivatechatController(),
+        fenix: true);
   }
 }

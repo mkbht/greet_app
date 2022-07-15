@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:greet_app/controllers/login_controller.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -19,7 +20,7 @@ class LoginScreen extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 8, vertical: 32),
                 child: Image.asset(
-                  'images/logo.png',
+                  'assets/images/logo.png',
                   width: 150,
                 ),
               ),
@@ -55,12 +56,20 @@ class LoginScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
               child: SizedBox(
                 height: 48,
-                child: ElevatedButton(
-                  onPressed: () {
-                    loginController.login();
-                  },
-                  child: const Text("Login"),
-                ),
+                child: Obx(() => ElevatedButton.icon(
+                      onPressed: () {
+                        loginController.login();
+                      },
+                      icon: loginController.isLoading.value
+                          ? CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2.0,
+                            )
+                          : Icon(MdiIcons.login),
+                      label: loginController.isLoading.value
+                          ? Text("")
+                          : Text("LOG IN"),
+                    )),
               ),
             ),
             Center(child: Text("New user?")),

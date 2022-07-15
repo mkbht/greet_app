@@ -59,7 +59,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 8, vertical: 32),
                 child: Image.asset(
-                  'images/logo.png',
+                  'assets/images/logo.png',
                   width: 150,
                 ),
               ),
