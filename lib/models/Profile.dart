@@ -4,6 +4,7 @@ class Profile {
   final String? email;
   final String? firstName;
   final String? lastName;
+  final String? avatar;
   final String? dateOfBirth;
   final bool? isFollowing;
   final List<Profile>? followers;
@@ -15,6 +16,7 @@ class Profile {
       this.email,
       this.firstName,
       this.lastName,
+      this.avatar,
       this.dateOfBirth,
       this.isFollowing,
       this.followers,
@@ -33,6 +35,7 @@ class Profile {
         email: json['email'],
         firstName: json['first_name'],
         lastName: json['last_name'],
+        avatar: json['avatar'],
         dateOfBirth: json['date_of_birth'],
         isFollowing: json['isFollowing'],
         followers: followers,

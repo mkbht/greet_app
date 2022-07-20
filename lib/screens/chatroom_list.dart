@@ -1,252 +1,246 @@
-import 'package:flutter/material.dart';
 import 'dart:async';
+import 'dart:convert';
 
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:pusher_channels_flutter/pusher_channels_flutter.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:greet_app/controllers/chatroom_controller.dart';
 
-class ChatroomListScreen extends StatefulWidget {
-  const ChatroomListScreen({Key? key}) : super(key: key);
-
-  @override
-  State<ChatroomListScreen> createState() => _ChatroomListScreenState();
-}
-
-class _ChatroomListScreenState extends State<ChatroomListScreen> {
-  PusherChannelsFlutter pusher = PusherChannelsFlutter.getInstance();
-  String _log = 'output:\n';
-  final _apiKey = TextEditingController();
-  final _cluster = TextEditingController();
-  final _channelName = TextEditingController();
-  final _eventName = TextEditingController();
-  final _channelFormKey = GlobalKey<FormState>();
-  final _eventFormKey = GlobalKey<FormState>();
-  final _listViewController = ScrollController();
-  final _data = TextEditingController();
-
-  void log(String text) {
-    print("LOG: $text");
-    setState(() {
-      _log += text + "\n";
-      Timer(
-          const Duration(milliseconds: 100),
-          () => _listViewController
-              .jumpTo(_listViewController.position.maxScrollExtent));
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    initPlatformState();
-  }
-
-  void onConnectPressed() async {
-    if (!_channelFormKey.currentState!.validate()) {
-      return;
-    }
-    // Remove keyboard
-    FocusScope.of(context).requestFocus(FocusNode());
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString("apiKey", _apiKey.text);
-    prefs.setString("cluster", _cluster.text);
-    prefs.setString("channelName", _channelName.text);
-
-    try {
-      await pusher.init(
-        apiKey: 'd8734d6756f535c53945',
-        cluster: _cluster.text,
-        onConnectionStateChange: onConnectionStateChange,
-        onError: onError,
-        onSubscriptionSucceeded: onSubscriptionSucceeded,
-        onEvent: onEvent,
-        onSubscriptionError: onSubscriptionError,
-        onDecryptionFailure: onDecryptionFailure,
-        onMemberAdded: onMemberAdded,
-        onMemberRemoved: onMemberRemoved,
-        // authEndpoint: "<Your Authendpoint Url>",
-        // onAuthorizer: onAuthorizer
-      );
-      await pusher.subscribe(channelName: _channelName.text);
-      await pusher.connect();
-    } catch (e) {
-      log("ERROR: $e");
-    }
-  }
-
-  void onConnectionStateChange(dynamic currentState, dynamic previousState) {
-    log("Connection: $currentState");
-  }
-
-  void onError(String message, int? code, dynamic e) {
-    log("onError: $message code: $code exception: $e");
-  }
-
-  void onEvent(PusherEvent event) {
-    log("onEvent: $event");
-  }
-
-  void onSubscriptionSucceeded(String channelName, dynamic data) {
-    log("onSubscriptionSucceeded: $channelName data: $data");
-    final me = pusher.getChannel(channelName)?.me;
-    log("Me: $me");
-  }
-
-  void onSubscriptionError(String message, dynamic e) {
-    log("onSubscriptionError: $message Exception: $e");
-  }
-
-  void onDecryptionFailure(String event, String reason) {
-    log("onDecryptionFailure: $event reason: $reason");
-  }
-
-  void onMemberAdded(String channelName, PusherMember member) {
-    log("onMemberAdded: $channelName user: $member");
-  }
-
-  void onMemberRemoved(String channelName, PusherMember member) {
-    log("onMemberRemoved: $channelName user: $member");
-  }
-
-  dynamic onAuthorizer(String channelName, String socketId, dynamic options) {
-    return {
-      "auth": "foo:bar",
-      "channel_data": '{"user_id": 1}',
-      "shared_secret": "foobar"
-    };
-  }
-
-  void onTriggerEventPressed() async {
-    var eventFormValidated = _eventFormKey.currentState!.validate();
-
-    if (!eventFormValidated) {
-      return;
-    }
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString("eventName", _eventName.text);
-    prefs.setString("data", _data.text);
-    pusher.trigger(PusherEvent(
-        channelName: _channelName.text,
-        eventName: _eventName.text,
-        data: _data.text));
-  }
-
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _apiKey.text = prefs.getString("apiKey") ?? 'd8734d6756f535c53945';
-      _cluster.text = prefs.getString("cluster") ?? 'eu';
-      _channelName.text = prefs.getString("channelName") ?? 'my-channel';
-      _eventName.text = prefs.getString("eventName") ?? 'client-event';
-      _data.text = prefs.getString("data") ?? 'test';
-    });
-  }
+class ChatroomListScreen extends StatelessWidget {
+  const ChatroomListScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
+    ChatRoomController chatRoomController = Get.find<ChatRoomController>();
+    chatRoomController.fetchChatRooms();
+    chatRoomController.fetchMyChatRooms();
+
+    return DefaultTabController(
+      length: 1,
+      child: Scaffold(
         appBar: AppBar(
-          title: Text(pusher.connectionState == 'DISCONNECTED'
-              ? 'Pusher Channels Example'
-              : _channelName.text),
+          title: Text("Chatrooms"),
+          elevation: 0,
+          bottom: TabBar(
+            isScrollable: true,
+            tabs: [
+              Tab(text: "Chatrooms"),
+            ],
+          ),
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: ListView(
-              controller: _listViewController,
-              scrollDirection: Axis.vertical,
-              shrinkWrap: true,
-              children: <Widget>[
-                if (pusher.connectionState != 'CONNECTED')
-                  Form(
-                      key: _channelFormKey,
-                      child: Column(children: <Widget>[
-                        TextFormField(
-                          controller: _apiKey,
-                          validator: (String? value) {
-                            return (value != null && value.isEmpty)
-                                ? 'Please enter your API key.'
-                                : null;
-                          },
-                          decoration:
-                              const InputDecoration(labelText: 'API Key'),
-                        ),
-                        TextFormField(
-                          controller: _cluster,
-                          validator: (String? value) {
-                            return (value != null && value.isEmpty)
-                                ? 'Please enter your cluster.'
-                                : null;
-                          },
-                          decoration: const InputDecoration(
-                            labelText: 'Cluster',
-                          ),
-                        ),
-                        TextFormField(
-                          controller: _channelName,
-                          validator: (String? value) {
-                            return (value != null && value.isEmpty)
-                                ? 'Please enter your channel name.'
-                                : null;
-                          },
-                          decoration: const InputDecoration(
-                            labelText: 'Channel',
-                          ),
-                        ),
-                        ElevatedButton(
-                          onPressed: onConnectPressed,
-                          child: const Text('Connect'),
-                        )
-                      ]))
-                else
-                  Form(
-                    key: _eventFormKey,
-                    child: Column(children: <Widget>[
-                      ListView.builder(
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          itemCount: pusher
-                              .channels[_channelName.text]?.members.length,
-                          itemBuilder: (context, index) {
-                            final member = pusher
-                                .channels[_channelName.text]!.members[index];
-                            return ListTile(
-                                title: Text(member!.userInfo.toString()),
-                                subtitle: Text(member.userId));
-                          }),
-                      TextFormField(
-                        controller: _eventName,
-                        validator: (String? value) {
-                          return (value != null && value.isEmpty)
-                              ? 'Please enter your event name.'
-                              : null;
-                        },
-                        decoration: const InputDecoration(
-                          labelText: 'Event',
-                        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Get.defaultDialog(
+                title: "Create Chatroom",
+                content: Column(
+                  children: [
+                    TextFormField(
+                      controller: chatRoomController.chatRoomName,
+                      decoration: InputDecoration(
+                        labelText: "Chatroom Name",
                       ),
-                      TextFormField(
-                        controller: _data,
-                        decoration: const InputDecoration(
-                          labelText: 'Data',
-                        ),
+                    ),
+                    TextFormField(
+                      controller: chatRoomController.chatRoomDescription,
+                      maxLines: null,
+                      decoration: InputDecoration(
+                        labelText: "Description",
                       ),
-                      ElevatedButton(
-                        onPressed: onTriggerEventPressed,
-                        child: const Text('Trigger Event'),
-                      ),
-                    ]),
+                    ),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    child: Text("Cancel"),
+                    onPressed: () {
+                      Get.back();
+                    },
                   ),
-                SingleChildScrollView(
-                    scrollDirection: Axis.vertical, child: Text(_log)),
-              ]),
+                  TextButton(
+                    child: Text("Create"),
+                    onPressed: () {
+                      chatRoomController.createChatroom().then((value) {
+                        chatRoomController.fetchChatRooms();
+                        chatRoomController.fetchMyChatRooms();
+                        //Get.back();
+                      });
+                      Get.back();
+                    },
+                  ),
+                ]);
+          },
+          child: Icon(Icons.add),
         ),
+        body: Obx(() => RefreshIndicator(
+              onRefresh: () async {
+                await chatRoomController.fetchChatRooms();
+                await chatRoomController.fetchMyChatRooms();
+              },
+              child: ListView(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "Popular Chatrooms",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  chatRoomController.chatRooms.isEmpty
+                      ? Center(
+                          child: ListTile(
+                            title: Center(child: Text("No Chatrooms")),
+                          ),
+                        )
+                      : ListView.builder(
+                          shrinkWrap: true,
+                          physics: ClampingScrollPhysics(),
+                          itemCount: chatRoomController.chatRooms.length,
+                          itemBuilder: (context, index) {
+                            return Card(
+                              child: ListTile(
+                                dense: true,
+                                trailing: Wrap(
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  spacing: 12, // space between two icons
+                                  children: <Widget>[
+                                    Text(
+                                        "${chatRoomController.chatRooms[index].joined!}/${chatRoomController.chatRooms[index].capacity!}"), // icon-1
+                                    Icon(Icons.chevron_right), // icon-2
+                                  ],
+                                ),
+                                title: Text(
+                                    chatRoomController.chatRooms[index].name ??
+                                        "N/A"),
+                                onTap: () {},
+                              ),
+                            );
+                          },
+                        ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "My Chatrooms",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  chatRoomController.myChatRooms.isEmpty
+                      ? Center(
+                          child: ListTile(
+                            title: Center(child: Text("No Chatrooms")),
+                          ),
+                        )
+                      : ListView.builder(
+                          shrinkWrap: true,
+                          physics: ClampingScrollPhysics(),
+                          itemCount: chatRoomController.myChatRooms.length,
+                          itemBuilder: (context, index) {
+                            return Card(
+                              child: ListTile(
+                                dense: true,
+                                trailing: Wrap(
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  spacing: 12, // space between two icons
+                                  children: <Widget>[
+                                    Text(
+                                        "${chatRoomController.chatRooms[index].joined!}/${chatRoomController.myChatRooms[index].capacity!}"), // icon-1
+                                    Icon(Icons.more_vert), // icon-2
+                                  ],
+                                ),
+                                title: Text(chatRoomController
+                                        .myChatRooms[index].name ??
+                                    "N/A"),
+                                onTap: () {
+                                  Get.defaultDialog(
+                                    title: "Options",
+                                    radius: 8,
+                                    content: Column(
+                                      children: [
+                                        ListTile(
+                                          title: Text("Join Chatroom"),
+                                          onTap: () {
+                                            Get.toNamed('/chatroom',
+                                                parameters: {
+                                                  'name': chatRoomController
+                                                      .myChatRooms[index].name!,
+                                                  'id': chatRoomController
+                                                      .myChatRooms[index].id!
+                                                      .toString(),
+                                                });
+                                          },
+                                        ),
+                                        ListTile(
+                                          title: Text("Delete Chatroom"),
+                                          onTap: () {
+                                            Get.defaultDialog(
+                                              barrierDismissible: false,
+                                              title: "Delete Chatroom",
+                                              actions: [
+                                                TextButton(
+                                                  child: Text("Cancel"),
+                                                  onPressed: () {
+                                                    Get.back();
+                                                  },
+                                                ),
+                                                TextButton(
+                                                  child: Text("Delete"),
+                                                  onPressed: () {
+                                                    chatRoomController
+                                                        .deleteChatroom(
+                                                            chatRoomController
+                                                                .myChatRooms[
+                                                                    index]
+                                                                .id!)
+                                                        .then((value) {
+                                                      chatRoomController
+                                                          .fetchChatRooms();
+                                                      chatRoomController
+                                                          .fetchMyChatRooms();
+                                                      Timer(
+                                                          Duration(seconds: 1),
+                                                          () async {
+                                                        Get.back(
+                                                            closeOverlays:
+                                                                true);
+                                                      });
+                                                      //.back(closeOverlays: true);
+                                                    }).catchError((error) {
+                                                      Get.back(
+                                                          closeOverlays: true);
+                                                    });
+                                                    if (chatRoomController
+                                                        .isLoading.value) {
+                                                      Get.defaultDialog(
+                                                        title: "Deleting...",
+                                                        barrierDismissible:
+                                                            false,
+                                                        content: Center(
+                                                          child:
+                                                              CircularProgressIndicator(),
+                                                        ),
+                                                      );
+                                                    }
+                                                  },
+                                                ),
+                                              ],
+                                              content: Center(
+                                                child: Text(
+                                                    "Are you sure you want to delete the chatroom?"),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                ],
+              ),
+            )),
       ),
     );
+    ;
   }
 }

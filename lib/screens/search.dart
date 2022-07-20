@@ -63,6 +63,9 @@ class SearchScreen extends StatelessWidget {
                       radius: 24,
                       backgroundColor: Colors.primaries[Random(user[index].id)
                           .nextInt(Colors.primaries.length)],
+                      foregroundImage: user[index].avatar != null
+                          ? NetworkImage(user[index].avatar!)
+                          : null,
                       child: Text(
                         user[index].username![0].toUpperCase(),
                         style: TextStyle(

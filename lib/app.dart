@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:greet_app/bindings/bindings.dart';
+import 'package:greet_app/screens/chatroom.dart';
+import 'package:greet_app/screens/chatroom_list.dart';
 import 'package:greet_app/screens/dashboard.dart';
+import 'package:greet_app/screens/discover.dart';
 import 'package:greet_app/screens/edit_profile.dart';
 import 'package:greet_app/screens/forgot_password.dart';
 import 'package:greet_app/screens/ice_breaker.dart';
@@ -30,6 +33,8 @@ class App extends StatelessWidget {
         GetPage(name: "/login", page: () => LoginScreen()),
         GetPage(name: "/register", page: () => RegisterScreen()),
         GetPage(name: "/dashboard", page: () => DashboardScreen()),
+        GetPage(name: "/chatrooms", page: () => ChatroomListScreen()),
+        GetPage(name: "/discover", page: () => DiscoverScreen()),
         GetPage(name: "/forgotPassword", page: () => ForgotPasswordScreen()),
         GetPage(name: "/myprofile", page: () => MyProfileScreen()),
         GetPage(name: "/profile", page: () => UserProfileScreen()),
@@ -37,6 +42,7 @@ class App extends StatelessWidget {
         GetPage(name: "/search", page: () => SearchScreen()),
         GetPage(name: "/privatechat", page: () => PrivateChatScreen()),
         GetPage(name: "/icebreaker", page: () => IceBreakerScreen()),
+        GetPage(name: "/chatroom", page: () => ChatroomScreen()),
       ],
     );
   }

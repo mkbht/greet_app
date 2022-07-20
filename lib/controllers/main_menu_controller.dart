@@ -22,5 +22,6 @@ class MainMenuController extends GetxController {
 
   void onTap(int index) {
     selectedIndex.value = index;
+    Get.toNamed("/dashboard");
   }
 }

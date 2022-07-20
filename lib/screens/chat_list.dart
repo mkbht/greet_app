@@ -35,6 +35,10 @@ class ChatListScreen extends StatelessWidget {
                   child: CircleAvatar(
                     backgroundColor: Colors.white,
                     radius: 23.0,
+                    foregroundImage: profileController.profile.value.avatar !=
+                            null
+                        ? NetworkImage(profileController.profile.value.avatar!)
+                        : null,
                     backgroundImage: AssetImage('assets/images/user.jpg'),
                   ),
                 ),
@@ -56,9 +60,9 @@ class ChatListScreen extends StatelessWidget {
                 await privatechatController.fetchChatList();
               },
               child: ListView.builder(
-                itemCount: privatechatController.chatList.value.length,
+                itemCount: privatechatController.chatList.length,
                 itemBuilder: ((context, index) {
-                  final chatUser = privatechatController.chatList.value;
+                  final chatUser = privatechatController.chatList;
                   return Card(
                     elevation: 0,
                     child: ListTile(
@@ -77,6 +81,9 @@ class ChatListScreen extends StatelessWidget {
                         backgroundColor: Colors.primaries[
                             Random(chatUser[index].id)
                                 .nextInt(Colors.primaries.length)],
+                        foregroundImage: chatUser[index].avatar != null
+                            ? NetworkImage(chatUser[index].avatar!)
+                            : null,
                         child: Text(
                           chatUser[index].username![0].toUpperCase(),
                           style: TextStyle(color: Colors.white),

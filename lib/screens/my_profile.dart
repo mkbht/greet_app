@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:greet_app/controllers/main_menu_controller.dart';
 import 'package:greet_app/controllers/profile_controller.dart';
 
 class MyProfileScreen extends StatelessWidget {
@@ -8,12 +9,18 @@ class MyProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ProfileController profileController = Get.find<ProfileController>();
+    MainMenuController mainMenuController = Get.find<MainMenuController>();
 
     return Obx(
       () => Scaffold(
         appBar: AppBar(
           elevation: 0,
           title: Text("Profile"),
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: mainMenuController.selectedIndex.value,
+          items: mainMenuController.menu,
+          onTap: mainMenuController.onTap,
         ),
         body: profileController.user.value.username == null
             ? Center(
@@ -40,6 +47,11 @@ class MyProfileScreen extends StatelessWidget {
                       child: CircleAvatar(
                         radius: 80,
                         //backgroundImage: AssetImage("assets/images/user.jpg"),
+                        foregroundImage:
+                            profileController.profile.value.avatar != null
+                                ? NetworkImage(
+                                    profileController.profile.value.avatar!)
+                                : null,
                         backgroundColor: Colors.blue,
                         child: Text(
                           profileController.user.value.username != null

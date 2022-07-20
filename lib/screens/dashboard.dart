@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:greet_app/controllers/main_menu_controller.dart';
+import 'package:greet_app/controllers/profile_controller.dart';
 import 'package:greet_app/screens/chat_list.dart';
 import 'package:greet_app/screens/chatroom_list.dart';
 import 'package:greet_app/screens/discover.dart';
+import 'package:greet_app/services/socket_api.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -11,6 +14,9 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     MainMenuController mainMenuController = Get.find<MainMenuController>();
+    ProfileController profileController = Get.find<ProfileController>();
+
+    profileController.fetchMyProfile();
 
     return Obx(
       () => Scaffold(

@@ -12,7 +12,9 @@ import 'package:get/get.dart';
 import 'package:greet_app/controllers/privatechat_controller.dart';
 import 'package:greet_app/controllers/profile_controller.dart';
 import 'package:greet_app/models/Profile.dart';
+import 'package:greet_app/services/socket_api.dart';
 import 'package:pusher_channels_flutter/pusher_channels_flutter.dart';
+import 'package:socket_io_client/socket_io_client.dart';
 
 class PrivateChatScreen extends StatefulWidget {
   const PrivateChatScreen({super.key});
@@ -26,40 +28,36 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
       Get.find<PrivatechatController>();
 
   final ProfileController profileController = Get.find<ProfileController>();
-  var pusher = PusherChannelsFlutter.getInstance();
   List<types.Message> messages = [];
   var timer;
+  Socket socket = SocketApi().getInstance();
 
   @override
   void initState() {
-    pusher.init(
-      apiKey: dotenv.env['PUSHER_APP_KEY']!,
-      cluster: dotenv.env['PUSHER_CLUSTER']!,
-      onEvent: onEvent,
-    );
-    pusher.connect();
     super.initState();
-    if (!kIsWeb) {
-      if (Platform.isAndroid) {
-        timer = Timer(Duration(seconds: 3), () async {
-          await privatechatController
-              .fetchChat(privatechatController.user.value.username!);
-          if (pusher.getChannel('chat_8_13') == null) {
-            pusher.subscribe(channelName: 'chat_8_13');
-          }
-        });
-      } else {
-        timer = Timer.periodic(Duration(seconds: 3), (time) async {
-          await privatechatController
-              .fetchChat(privatechatController.user.value.username!);
+    timer = Timer(Duration(seconds: 3), () async {
+      await privatechatController
+          .fetchChat(privatechatController.user.value.username!);
+    });
+
+    socket.on("sendMessage", (message) {
+      var data = jsonDecode(jsonEncode(message));
+
+      print("Message received: ${jsonEncode(message)}");
+      final textMessage = types.TextMessage(
+        author: types.User(id: data["sender"].toString()),
+        createdAt: DateTime.parse(data["created_at"]).millisecondsSinceEpoch,
+        id: data["id"].toString(),
+        text: data["message"],
+      );
+
+      if (privatechatController.user.value.id != data["receiver"] &&
+          privatechatController.user.value.id == data["sender"]) {
+        setState(() {
+          messages.insert(0, textMessage);
         });
       }
-    } else {
-      timer = Timer.periodic(Duration(seconds: 3), (time) async {
-        await privatechatController
-            .fetchChat(privatechatController.user.value.username!);
-      });
-    }
+    });
 
     setState(() {
       messages = privatechatController.messages;
@@ -71,21 +69,10 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
     super.dispose();
   }
 
-  void onEvent(PusherEvent event) {
-    if (event.eventName == 'send-message') {
-      var data = jsonDecode(event.data);
-      final textMessage = types.TextMessage(
-        author: types.User(id: data["sender"].toString()),
-        createdAt: DateTime.parse(data["created_at"]).millisecondsSinceEpoch,
-        id: data["id"].toString(),
-        text: data["message"],
-      );
-
-      if (privatechatController.user.value.id != data["receiver"]) {
-        setState(() {
-          messages.insert(0, textMessage);
-        });
-      }
+  @override
+  void setState(fn) {
+    if (mounted) {
+      super.setState(fn);
     }
   }
 
@@ -104,6 +91,7 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
                 ),
                 messages: messages,
                 onSendPressed: (message) => _handleSendPressed(message),
+                onTextChanged: (message) => _handleTextChanged(message),
                 onEndReached: () {
                   return Future.value();
                 },
@@ -130,5 +118,14 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
     final random = Random.secure();
     final values = List<int>.generate(16, (i) => random.nextInt(255));
     return base64UrlEncode(values);
+  }
+
+  _handleTextChanged(String message) {
+    socket.emit("sendMessage", {
+      "sender": profileController.user.value.id.toString(),
+      "receiver": privatechatController.user.value.id.toString(),
+      "message": message,
+      "created_at": DateTime.now().toString(),
+    });
   }
 }

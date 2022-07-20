@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:greet_app/controllers/main_menu_controller.dart';
 import 'package:greet_app/controllers/privatechat_controller.dart';
 import 'package:greet_app/controllers/profile_controller.dart';
 
@@ -12,9 +13,16 @@ class UserProfileScreen extends StatelessWidget {
     PrivatechatController privatechatController =
         Get.find<PrivatechatController>();
 
+    MainMenuController mainMenuController = Get.find<MainMenuController>();
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: mainMenuController.selectedIndex.value,
+        items: mainMenuController.menu,
+        onTap: mainMenuController.onTap,
       ),
       body: Obx(
         () => profileController.isProfileLoading.value
@@ -41,6 +49,11 @@ class UserProfileScreen extends StatelessWidget {
                         radius: 80,
                         //backgroundImage: AssetImage("assets/images/user.jpg"),
                         backgroundColor: Colors.blue,
+                        foregroundImage:
+                            profileController.profile.value.avatar != null
+                                ? NetworkImage(
+                                    profileController.profile.value.avatar!)
+                                : null,
                         child: Text(
                           profileController.profile.value.username != null
                               ? profileController.profile.value.username![0]

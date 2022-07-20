@@ -8,9 +8,11 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:greet_app/models/ChatList.dart';
 import 'package:greet_app/models/Profile.dart';
+import 'package:greet_app/services/socket_api.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:pusher_channels_flutter/pusher_channels_flutter.dart';
+import 'package:socket_io_client/socket_io_client.dart';
 
 class PrivatechatController extends GetxController {
   final storage = GetStorage();
@@ -18,19 +20,16 @@ class PrivatechatController extends GetxController {
   final messages = <types.Message>[].obs;
   final user = Profile().obs;
   final isLoading = false.obs;
+  Socket socket = SocketApi().getInstance();
 
   @override
   void onInit() {
     super.onInit();
     fetchChatList();
-  }
 
-  void onEvent(PusherEvent event) {
-    if (event.eventName == "send-message") {
-      print(event.data);
-      messages.insert(0, event.data);
-      messages.refresh();
-    }
+    socket.on("sendMessage", (data) {
+      fetchChatList();
+    });
   }
 
   Future fetchChatList() async {
