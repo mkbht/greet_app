@@ -13,6 +13,7 @@ class ChatroomListScreen extends StatelessWidget {
     ChatRoomController chatRoomController = Get.find<ChatRoomController>();
     chatRoomController.fetchChatRooms();
     chatRoomController.fetchMyChatRooms();
+    chatRoomController.fetchJoinedChatRooms();
 
     return DefaultTabController(
       length: 1,
@@ -61,6 +62,7 @@ class ChatroomListScreen extends StatelessWidget {
                       chatRoomController.createChatroom().then((value) {
                         chatRoomController.fetchChatRooms();
                         chatRoomController.fetchMyChatRooms();
+                        chatRoomController.fetchJoinedChatRooms();
                         //Get.back();
                       });
                       Get.back();
@@ -74,9 +76,52 @@ class ChatroomListScreen extends StatelessWidget {
               onRefresh: () async {
                 await chatRoomController.fetchChatRooms();
                 await chatRoomController.fetchMyChatRooms();
+                await chatRoomController.fetchJoinedChatRooms();
               },
               child: ListView(
                 children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "Joined Chatrooms",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  chatRoomController.joinedRooms.isEmpty
+                      ? Center(
+                          child: ListTile(
+                            title: Center(child: Text("No Chatrooms")),
+                          ),
+                        )
+                      : ListView.builder(
+                          shrinkWrap: true,
+                          physics: ClampingScrollPhysics(),
+                          itemCount: chatRoomController.joinedRooms.length,
+                          itemBuilder: (context, index) {
+                            return Card(
+                              child: ListTile(
+                                dense: true,
+                                trailing: Wrap(
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  spacing: 12, // space between two icons
+                                  children: <Widget>[
+                                    Text(
+                                        "${chatRoomController.joinedRooms[index].joined!}/${chatRoomController.joinedRooms[index].capacity!}"), // icon-1
+                                    Icon(Icons.chevron_right), // icon-2
+                                  ],
+                                ),
+                                title: Text(chatRoomController
+                                        .joinedRooms[index].name ??
+                                    "N/A"),
+                                onTap: () {
+                                  print(index);
+                                  chatRoomController.joinChatroom(
+                                      chatRoomController.joinedRooms[index].id);
+                                },
+                              ),
+                            );
+                          },
+                        ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
@@ -110,7 +155,11 @@ class ChatroomListScreen extends StatelessWidget {
                                 title: Text(
                                     chatRoomController.chatRooms[index].name ??
                                         "N/A"),
-                                onTap: () {},
+                                onTap: () {
+                                  print(index);
+                                  chatRoomController.joinChatroom(
+                                      chatRoomController.chatRooms[index].id);
+                                },
                               ),
                             );
                           },
@@ -141,7 +190,7 @@ class ChatroomListScreen extends StatelessWidget {
                                   spacing: 12, // space between two icons
                                   children: <Widget>[
                                     Text(
-                                        "${chatRoomController.chatRooms[index].joined!}/${chatRoomController.myChatRooms[index].capacity!}"), // icon-1
+                                        "${chatRoomController.myChatRooms[index].joined!}/${chatRoomController.myChatRooms[index].capacity!}"), // icon-1
                                     Icon(Icons.more_vert), // icon-2
                                   ],
                                 ),
@@ -157,14 +206,9 @@ class ChatroomListScreen extends StatelessWidget {
                                         ListTile(
                                           title: Text("Join Chatroom"),
                                           onTap: () {
-                                            Get.toNamed('/chatroom',
-                                                parameters: {
-                                                  'name': chatRoomController
-                                                      .myChatRooms[index].name!,
-                                                  'id': chatRoomController
-                                                      .myChatRooms[index].id!
-                                                      .toString(),
-                                                });
+                                            chatRoomController.joinChatroom(
+                                                chatRoomController
+                                                    .myChatRooms[index].id);
                                           },
                                         ),
                                         ListTile(
@@ -188,7 +232,7 @@ class ChatroomListScreen extends StatelessWidget {
                                                             chatRoomController
                                                                 .myChatRooms[
                                                                     index]
-                                                                .id!)
+                                                                .id)
                                                         .then((value) {
                                                       chatRoomController
                                                           .fetchChatRooms();
