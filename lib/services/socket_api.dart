@@ -16,7 +16,7 @@ class SocketApi {
   // All socket related functions.
   IO.Socket getInstance() {
     IO.Socket socket = IO.io(
-        'http://${dotenv.env['SOCKET_URL']}',
+        '${dotenv.env['SOCKET_URL']}',
         IO.OptionBuilder()
             .setTransports(['websocket'])
             .enableAutoConnect()

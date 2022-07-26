@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:greet_app/controllers/main_menu_controller.dart';
 import 'package:greet_app/controllers/privatechat_controller.dart';
 import 'package:greet_app/controllers/profile_controller.dart';
+import 'package:greet_app/widgets/profile_link.dart';
 
 class UserProfileScreen extends StatelessWidget {
   const UserProfileScreen({super.key});
@@ -17,6 +18,7 @@ class UserProfileScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        title: Text("Profile"),
         elevation: 0,
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -121,8 +123,11 @@ class UserProfileScreen extends StatelessWidget {
                             child: OutlinedButton(
                               onPressed: () {
                                 privatechatController.fetchChat(
-                                    profileController.profile.value.username!);
-                                Get.toNamed("privatechat");
+                                    profileController.profile.value.id!);
+                                Get.toNamed("privatechat", parameters: {
+                                  "id": profileController.profile.value.id
+                                      .toString(),
+                                });
                               },
                               child: Text("Message"),
                             ),
@@ -137,29 +142,105 @@ class UserProfileScreen extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          Column(
-                            children: [
-                              Text(
-                                "${profileController.profile.value.followers?.length}",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16.0,
+                          InkWell(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text("Followers"),
+                                        IconButton(
+                                            onPressed: () =>
+                                                Navigator.of(context).pop(),
+                                            icon: Icon(Icons.close)),
+                                      ],
+                                    ),
+                                    actions: [],
+                                    content: Container(
+                                      width: double.maxFinite,
+                                      child: ListView.builder(
+                                        itemCount: profileController
+                                            .profile.value.followers!.length,
+                                        itemBuilder: (BuildContext buildContext,
+                                            int index) {
+                                          return ProfileLink(
+                                            user: profileController.profile
+                                                .value.followers![index],
+                                          );
+                                        },
+                                        shrinkWrap: true,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                            child: Column(
+                              children: [
+                                Text(
+                                  "${profileController.profile.value.followers?.length}",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16.0,
+                                  ),
                                 ),
-                              ),
-                              Text("Followers")
-                            ],
+                                Text("Followers")
+                              ],
+                            ),
                           ),
-                          Column(
-                            children: [
-                              Text(
-                                "${profileController.profile.value.followings?.length}",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16.0,
+                          InkWell(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text("Followings"),
+                                        IconButton(
+                                            onPressed: () =>
+                                                Navigator.of(context).pop(),
+                                            icon: Icon(Icons.close)),
+                                      ],
+                                    ),
+                                    actions: [],
+                                    content: Container(
+                                      width: double.maxFinite,
+                                      child: ListView.builder(
+                                        itemCount: profileController
+                                            .profile.value.followings!.length,
+                                        itemBuilder: (BuildContext buildContext,
+                                            int index) {
+                                          return ProfileLink(
+                                            user: profileController.profile
+                                                .value.followings![index],
+                                          );
+                                        },
+                                        shrinkWrap: true,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                            child: Column(
+                              children: [
+                                Text(
+                                  "${profileController.profile.value.followings?.length}",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16.0,
+                                  ),
                                 ),
-                              ),
-                              Text("Followings")
-                            ],
+                                Text("Followings")
+                              ],
+                            ),
                           ),
                         ],
                       ),

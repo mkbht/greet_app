@@ -43,7 +43,7 @@ class LoginController extends GetxController {
         Login loginData = Login.fromJson(jsonDecode(response.body));
         storage.write("bearer", loginData.type);
         storage.write("token", loginData.token);
-        storage.write("user", loginData.user);
+        storage.write("user", jsonDecode(response.body)["user"]);
         IO.Socket socket = SocketApi().getInstance();
 
         Profile userID = Profile.fromJson(jsonDecode(response.body)["user"]);

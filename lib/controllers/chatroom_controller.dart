@@ -16,6 +16,7 @@ class ChatRoomController extends GetxController {
   final myChatRooms = <ChatRoom>[].obs;
   final RxList<ChatRoom> joinedRooms = <ChatRoom>[].obs;
   final isLoading = false.obs;
+  final isJoining = false.obs;
   Socket socket = SocketApi().getInstance();
   final chatRoomName = TextEditingController();
   final chatRoomDescription = TextEditingController();
@@ -26,12 +27,13 @@ class ChatRoomController extends GetxController {
     super.onInit();
     socket.on("sendChatRoomMessage", (data) {
       var message = jsonDecode(jsonEncode(data));
-      var room =
+      var roomIndex =
           joinedRooms.indexWhere((room) => room.id == message["chatroom_id"]);
-      room == -1
+      roomIndex == -1
           ? null
-          : joinedRooms[room].messages?.add(ChatRoomMessage.fromJson(message));
-      joinedRooms.refresh();
+          : joinedRooms[roomIndex]
+              .messages
+              ?.add(ChatRoomMessage.fromJson(message));
     });
   }
 
@@ -143,7 +145,13 @@ class ChatRoomController extends GetxController {
       if (response.statusCode == 200) {
         List<ChatRoom> getChatRooms = List<ChatRoom>.from(
             jsonDecode(response.body).map((x) => ChatRoom.fromJson(x)));
-        joinedRooms.value = getChatRooms;
+        getChatRooms.forEach((room) {
+          var roomIndex =
+              joinedRooms.indexWhere((room1) => room1.id == room.id);
+          if (roomIndex == -1) {
+            joinedRooms.add(room);
+          }
+        });
       } else {
         // If the server did not return a 200 OK response,
         // then throw an exception.
@@ -266,6 +274,10 @@ class ChatRoomController extends GetxController {
               }));
 
       if (response.statusCode == 200) {
+        var index = joinedRooms.indexWhere((element) => element.id == id);
+        if (index != -1) {
+          joinedRooms.removeAt(index);
+        }
         Get.snackbar(
           "Success",
           jsonDecode(response.body)['message'],
@@ -313,7 +325,7 @@ class ChatRoomController extends GetxController {
   }
 
   Future joinChatroom(int id) async {
-    isLoading.value = true;
+    isJoining.value = true;
     try {
       final response =
           await http.post(Uri.parse('${dotenv.env['API_URL']}/chatrooms/join'),
@@ -326,10 +338,19 @@ class ChatRoomController extends GetxController {
               }));
 
       if (response.statusCode == 200) {
-        Get.toNamed('/chatroom', parameters: {
-          'name': jsonDecode(response.body)['name'],
-          'id': jsonDecode(response.body)['id'].toString(),
-        });
+        var chatroom = ChatRoom.fromJson(jsonDecode(response.body));
+        var roomIndex =
+            joinedRooms.indexWhere((element) => element.id == chatroom.id);
+        print(roomIndex);
+        if (roomIndex != -1) {
+          //joinedRooms[roomIndex] = chatroom;
+        } else {
+          joinedRooms.add(chatroom);
+        }
+        // Get.toNamed('/chatroom', parameters: {
+        //   'name': jsonDecode(response.body)['name'],
+        //   'id': jsonDecode(response.body)['id'].toString(),
+        // });
       } else {
         // If the server did not return a 200 OK response,
         // then throw an exception.
@@ -359,7 +380,7 @@ class ChatRoomController extends GetxController {
         snackPosition: SnackPosition.BOTTOM,
       );
     } finally {
-      isLoading.value = false;
+      isJoining.value = false;
     }
   }
 

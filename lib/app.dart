@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:greet_app/bindings/bindings.dart';
 import 'package:greet_app/screens/chatroom.dart';
 import 'package:greet_app/screens/chatroom_list.dart';
@@ -21,14 +22,16 @@ class App extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    var storage = GetStorage();
     return GetMaterialApp(
       title: 'Greet',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.indigo,
+        canvasColor: Colors.white,
       ),
       initialBinding: GetxBindings(),
-      initialRoute: '/login',
+      initialRoute: storage.read("token") == null ? '/login' : '/dashboard',
       getPages: [
         GetPage(name: "/login", page: () => LoginScreen()),
         GetPage(name: "/register", page: () => RegisterScreen()),

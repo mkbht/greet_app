@@ -17,15 +17,19 @@ import 'package:socket_io_client/socket_io_client.dart';
 class PrivatechatController extends GetxController {
   final storage = GetStorage();
   final chatList = <ChatList>[].obs;
+  final unreadCount = 0.obs;
   final messages = <types.Message>[].obs;
   final user = Profile().obs;
   final isLoading = false.obs;
+  final isChatLoading = false.obs;
   Socket socket = SocketApi().getInstance();
 
   @override
   void onInit() {
     super.onInit();
     fetchChatList();
+    var currentUser = storage.read("user");
+    socket.emit("login", currentUser['id']);
 
     socket.on("sendMessage", (data) {
       fetchChatList();
@@ -47,6 +51,9 @@ class PrivatechatController extends GetxController {
         List<ChatList> getChats = List<ChatList>.from(
             jsonDecode(response.body).map((x) => ChatList.fromJson(x)));
         chatList.value = getChats;
+        unreadCount.value = getChats
+            .where((x) => x.seenAt == null && x.senderId != x.receiverId)
+            .length;
         update();
       } else {
         // If the server did not return a 200 OK response,
@@ -126,11 +133,11 @@ class PrivatechatController extends GetxController {
     }
   }
 
-  Future fetchChat(String username) async {
-    isLoading.value = true;
+  Future fetchChat(int id) async {
+    isChatLoading.value = true;
     try {
       final response = await http.get(
-        Uri.parse('${dotenv.env['API_URL']}/chat?username=$username'),
+        Uri.parse('${dotenv.env['API_URL']}/chat?user_id=${id.toString()}'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer ${storage.read("token")}',
@@ -183,7 +190,7 @@ class PrivatechatController extends GetxController {
         snackPosition: SnackPosition.BOTTOM,
       );
     } finally {
-      isLoading.value = false;
+      isChatLoading.value = false;
     }
   }
 

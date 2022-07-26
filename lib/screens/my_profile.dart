@@ -10,6 +10,7 @@ class MyProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     ProfileController profileController = Get.find<ProfileController>();
     MainMenuController mainMenuController = Get.find<MainMenuController>();
+    profileController.fetchMyProfile();
 
     return Obx(
       () => Scaffold(
@@ -47,11 +48,10 @@ class MyProfileScreen extends StatelessWidget {
                       child: CircleAvatar(
                         radius: 80,
                         //backgroundImage: AssetImage("assets/images/user.jpg"),
-                        foregroundImage:
-                            profileController.profile.value.avatar != null
-                                ? NetworkImage(
-                                    profileController.profile.value.avatar!)
-                                : null,
+                        foregroundImage: profileController.user.value.avatar !=
+                                null
+                            ? NetworkImage(profileController.user.value.avatar!)
+                            : null,
                         backgroundColor: Colors.blue,
                         child: Text(
                           profileController.user.value.username != null

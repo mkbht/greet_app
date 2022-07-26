@@ -25,7 +25,7 @@ class ProfileController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchMyProfile();
+    //fetchMyProfile();
   }
 
   @override
@@ -39,6 +39,13 @@ class ProfileController extends GetxController {
   void setProfile(String username) {
     this.username.value = username;
     fetchUserProfile(username);
+  }
+
+  Future logout() async {
+    storage.remove("bearer");
+    storage.remove("token");
+    storage.remove("user");
+    Get.offAllNamed("/login");
   }
 
   Future fetchMyProfile() async {

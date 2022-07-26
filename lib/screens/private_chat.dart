@@ -24,6 +24,7 @@ class PrivateChatScreen extends StatefulWidget {
 }
 
 class _PrivateChatScreenState extends State<PrivateChatScreen> {
+  final parameters = Get.parameters;
   final PrivatechatController privatechatController =
       Get.find<PrivatechatController>();
 
@@ -35,15 +36,13 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
   @override
   void initState() {
     super.initState();
-    timer = Timer(Duration(seconds: 3), () async {
-      await privatechatController
-          .fetchChat(privatechatController.user.value.username!);
+    timer = Timer(Duration(seconds: 0), () async {
+      await privatechatController.fetchChat(int.parse(parameters["id"]!));
     });
 
     socket.on("sendMessage", (message) {
       var data = jsonDecode(jsonEncode(message));
 
-      print("Message received: ${jsonEncode(message)}");
       final textMessage = types.TextMessage(
         author: types.User(id: data["sender"].toString()),
         createdAt: DateTime.parse(data["created_at"]).millisecondsSinceEpoch,
@@ -78,12 +77,17 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() => Scaffold(
-          appBar: AppBar(
-            elevation: 0,
-            title: Text(privatechatController.user.value.username ?? ""),
-          ),
-          body: Obx(() => Chat(
+    return Obx(
+      () => Scaffold(
+        appBar: AppBar(
+          elevation: 0,
+          title: Text(privatechatController.user.value.username ?? ""),
+        ),
+        body: privatechatController.isChatLoading.value
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : Chat(
                 theme: const DefaultChatTheme(
                   inputBackgroundColor: Colors.black12,
                   inputTextColor: Colors.black,
@@ -97,8 +101,9 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
                 },
                 user:
                     types.User(id: profileController.user.value.id.toString()),
-              )),
-        ));
+              ),
+      ),
+    );
   }
 
   void _handleSendPressed(types.PartialText message) {

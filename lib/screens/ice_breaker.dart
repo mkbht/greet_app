@@ -29,9 +29,9 @@ class IceBreakerScreen extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
                 privatechatController.iceBreaker().then((value) {
-                  privatechatController
-                      .fetchChat(privatechatController.user.value.username!);
-                  Get.toNamed("privatechat");
+                  Get.toNamed("privatechat", parameters: {
+                    "id": privatechatController.user.value.id.toString(),
+                  });
                 });
               },
               child: Text("Break the ice"),
