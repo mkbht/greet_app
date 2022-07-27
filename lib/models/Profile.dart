@@ -1,3 +1,5 @@
+import 'package:greet_app/models/Gift.dart';
+
 class Profile {
   final int? id;
   final String? username;
@@ -9,6 +11,7 @@ class Profile {
   final bool? isFollowing;
   final List<Profile>? followers;
   final List<Profile>? followings;
+  final List<Gift>? gifts;
 
   const Profile(
       {this.id,
@@ -20,7 +23,8 @@ class Profile {
       this.dateOfBirth,
       this.isFollowing,
       this.followers,
-      this.followings});
+      this.followings,
+      this.gifts});
 
   factory Profile.fromJson(Map<String, dynamic> json) {
     List<Profile> followers = json['followers'] != null

@@ -448,6 +448,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.10.0"
+  stories_for_flutter:
+    dependency: "direct main"
+    description:
+      name: stories_for_flutter
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.2.0"
   stream_channel:
     dependency: transitive
     description:

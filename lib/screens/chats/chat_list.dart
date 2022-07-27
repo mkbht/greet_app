@@ -7,8 +7,11 @@ import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:greet_app/controllers/privatechat_controller.dart';
 import 'package:greet_app/controllers/profile_controller.dart';
+import 'package:greet_app/screens/chats/stories.dart';
 import 'package:greet_app/screens/profile/my_profile.dart';
 import 'package:intl/intl.dart';
+import 'package:stories_for_flutter/stories_for_flutter.dart';
+import 'package:stories_for_flutter/story_circle.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class ChatListScreen extends StatelessWidget {
@@ -28,6 +31,67 @@ class ChatListScreen extends StatelessWidget {
           physics: AlwaysScrollableScrollPhysics(),
           child: Column(
             children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Stories(
+                  displayProgress: true,
+                  storyItemList: [
+                    // First group of stories
+                    StoryItem(
+                        name: "harmon35",
+                        thumbnail: NetworkImage(
+                          "https://assets.materialup.com/uploads/82eae29e-33b7-4ff7-be10-df432402b2b6/preview",
+                        ),
+                        stories: [
+                          // First story
+                          Scaffold(
+                            body: Container(
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: NetworkImage(
+                                    "https://wallpaperaccess.com/full/16568.png",
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          // Second story in first group
+                          Scaffold(
+                            body: Center(
+                              child: Text(
+                                "harmon35",
+                                style: TextStyle(
+                                  color: Color(0xff777777),
+                                  fontSize: 25,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ]),
+                    // Second story group
+                    StoryItem(
+                      name: "rita6",
+                      thumbnail: NetworkImage(
+                        "https://www.shareicon.net/data/512x512/2017/03/29/881758_cup_512x512.png",
+                      ),
+                      stories: [
+                        Scaffold(
+                          body: Center(
+                            child: Text(
+                              "That's it, Folks !",
+                              style: TextStyle(
+                                color: Color(0xff777777),
+                                fontSize: 25,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
               ListView.builder(
                 itemCount: privatechatController.chatList.length,
                 physics: NeverScrollableScrollPhysics(),
