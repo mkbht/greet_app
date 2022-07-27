@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:get/state_manager.dart';
 import 'package:greet_app/controllers/profile_controller.dart';
@@ -18,9 +19,11 @@ class ProfileLink extends StatelessWidget {
     return ListTile(
       contentPadding: EdgeInsets.all(0),
       onTap: () {
-        profileController.setProfile(user.username!);
-        Get.toNamed("/profile");
-        Navigator.of(context).pop();
+        //profileController.setProfile(user.username!);
+        Navigator.of(context, rootNavigator: true).pop();
+        //Get.toNamed("/profile", parameters: {"username": user.username!});
+        Get.toNamed("/profile",
+            parameters: {"username": user.username!}, preventDuplicates: true);
       },
       title: Text(
         '${user.firstName!} ${user.lastName!}',

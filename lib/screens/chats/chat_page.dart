@@ -24,6 +24,7 @@ class ChatPageScreen extends StatelessWidget {
         child: Scaffold(
           appBar: AppBar(
             title: Text("Greet"),
+            automaticallyImplyLeading: false,
             centerTitle: true,
             elevation: 0,
             actions: [
@@ -41,12 +42,16 @@ class ChatPageScreen extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: CircleAvatar(
+                  radius: 20,
                   backgroundColor: Colors.white,
-                  radius: 20.0,
-                  foregroundImage: profileController.user.value.avatar != null
-                      ? NetworkImage(profileController.user.value.avatar!)
-                      : null,
-                  backgroundImage: AssetImage('assets/images/user.jpg'),
+                  child: CircleAvatar(
+                    backgroundColor: Colors.white,
+                    radius: 18.0,
+                    foregroundImage: profileController.user.value.avatar != null
+                        ? NetworkImage(profileController.user.value.avatar!)
+                        : null,
+                    backgroundImage: AssetImage('assets/images/user.jpg'),
+                  ),
                 ),
               ),
             ),
@@ -76,8 +81,6 @@ class ChatPageScreen extends StatelessWidget {
             ),
           ),
           body: TabBarView(
-            physics: BouncingScrollPhysics(),
-            dragStartBehavior: DragStartBehavior.down,
             children: [
               ChatListScreen(),
               FriendListScreen(),

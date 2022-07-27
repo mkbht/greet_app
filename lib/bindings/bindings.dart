@@ -9,7 +9,7 @@ class GetxBindings implements Bindings {
 // default dependency
   @override
   void dependencies() {
-    Get.lazyPut<LoginController>(() => LoginController());
+    Get.lazyPut<LoginController>(() => LoginController(), fenix: true);
     Get.lazyPut<MainMenuController>(() => MainMenuController(), fenix: true);
     Get.lazyPut<ProfileController>(() => ProfileController(), fenix: true);
     Get.lazyPut<PrivatechatController>(() => PrivatechatController(),

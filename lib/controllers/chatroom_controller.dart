@@ -14,13 +14,14 @@ class ChatRoomController extends GetxController {
   final storage = GetStorage();
   final chatRooms = <ChatRoom>[].obs;
   final myChatRooms = <ChatRoom>[].obs;
-  final RxList<ChatRoom> joinedRooms = <ChatRoom>[].obs;
+  final joinedRooms = <ChatRoom>[].obs;
   final isLoading = false.obs;
   final isJoining = false.obs;
   Socket socket = SocketApi().getInstance();
   final chatRoomName = TextEditingController();
   final chatRoomDescription = TextEditingController();
   final messageField = TextEditingController();
+  final scrollController = ScrollController();
 
   @override
   void onInit() {
@@ -34,6 +35,20 @@ class ChatRoomController extends GetxController {
           : joinedRooms[roomIndex]
               .messages
               ?.add(ChatRoomMessage.fromJson(message));
+      joinedRooms.refresh();
+      if (scrollController.hasClients) {
+        Future.delayed(
+          Duration(milliseconds: 200),
+          () {
+            scrollController.animateTo(
+              scrollController.position.maxScrollExtent,
+              duration: Duration(milliseconds: 400),
+              curve: Curves.ease,
+            );
+          },
+        );
+      }
+      //scrollController.jumpTo(scrollController.position.maxScrollExtent);
     });
   }
 
@@ -384,7 +399,62 @@ class ChatRoomController extends GetxController {
     }
   }
 
-  Future sendMessage(int id) async {
+  Future leaveChatroom(int id) async {
+    isJoining.value = true;
+    try {
+      final response =
+          await http.post(Uri.parse('${dotenv.env['API_URL']}/chatrooms/leave'),
+              headers: <String, String>{
+                'Content-Type': 'application/json; charset=UTF-8',
+                'Authorization': 'Bearer ${storage.read("token")}',
+              },
+              body: jsonEncode(<String, dynamic>{
+                'chatroom_id': id,
+              }));
+
+      if (response.statusCode == 200) {
+        var roomIndex = joinedRooms.indexWhere((element) => element.id == id);
+        if (roomIndex != -1) {
+          joinedRooms.removeAt(roomIndex);
+        } else {}
+        // Get.toNamed('/chatroom', parameters: {
+        //   'name': jsonDecode(response.body)['name'],
+        //   'id': jsonDecode(response.body)['id'].toString(),
+        // });
+      } else {
+        // If the server did not return a 200 OK response,
+        // then throw an exception.
+        Get.snackbar(
+          "Error",
+          jsonDecode(response.body)['message'],
+          icon: Icon(
+            Icons.error,
+            color: Colors.white,
+          ),
+          colorText: Colors.white,
+          backgroundColor: Colors.red,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return false;
+      }
+    } on Exception {
+      Get.snackbar(
+        "Error",
+        "Could not connect to server.",
+        icon: Icon(
+          Icons.error,
+          color: Colors.white,
+        ),
+        colorText: Colors.white,
+        backgroundColor: Colors.red,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isJoining.value = false;
+    }
+  }
+
+  Future sendMessage(int id, String message) async {
     try {
       final response =
           await http.post(Uri.parse('${dotenv.env['API_URL']}/chatrooms/send'),
@@ -394,7 +464,7 @@ class ChatRoomController extends GetxController {
               },
               body: jsonEncode(<String, dynamic>{
                 'chatroom_id': id,
-                'message': messageField.text,
+                'message': message,
               }));
 
       if (response.statusCode == 200) {

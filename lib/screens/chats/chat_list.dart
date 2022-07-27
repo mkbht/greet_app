@@ -7,7 +7,7 @@ import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:greet_app/controllers/privatechat_controller.dart';
 import 'package:greet_app/controllers/profile_controller.dart';
-import 'package:greet_app/screens/my_profile.dart';
+import 'package:greet_app/screens/profile/my_profile.dart';
 import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -25,8 +25,7 @@ class ChatListScreen extends StatelessWidget {
           await privatechatController.fetchChatList();
         },
         child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          physics: ScrollPhysics(),
+          physics: AlwaysScrollableScrollPhysics(),
           child: Column(
             children: [
               ListView.builder(

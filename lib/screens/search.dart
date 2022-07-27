@@ -53,8 +53,9 @@ class SearchScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(0.0),
                   child: ListTile(
                     onTap: () {
-                      profileController.setProfile(user[index].username!);
-                      Get.toNamed("/profile");
+                      // profileController.setProfile(user[index].username!);
+                      Get.toNamed("/profile",
+                          parameters: {"username": user[index].username!});
                     },
                     title: Text(
                         "${user[index].firstName ?? ""} ${user[index].lastName ?? ""}"),

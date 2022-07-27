@@ -81,7 +81,29 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
       () => Scaffold(
         appBar: AppBar(
           elevation: 0,
-          title: Text(privatechatController.user.value.username ?? ""),
+          titleSpacing: 0,
+          title: ListTile(
+            textColor: Colors.white,
+            title: Text(
+              privatechatController.user.value.username ?? "",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            subtitle: Text("Click to view profile"),
+            contentPadding: EdgeInsets.all(0),
+            leading: CircleAvatar(
+              backgroundColor: Colors.primaries[
+                  Random(privatechatController.user.value.id)
+                      .nextInt(Colors.primaries.length)],
+              foregroundImage: privatechatController.user.value.avatar != null
+                  ? NetworkImage(privatechatController.user.value.avatar!)
+                  : null,
+            ),
+            onTap: () {
+              Get.toNamed("/profile", parameters: {
+                "username": privatechatController.user.value.username!
+              });
+            },
+          ),
         ),
         body: privatechatController.isChatLoading.value
             ? Center(
