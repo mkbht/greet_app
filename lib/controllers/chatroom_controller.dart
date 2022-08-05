@@ -48,7 +48,26 @@ class ChatRoomController extends GetxController {
           },
         );
       }
-      //scrollController.jumpTo(scrollController.position.maxScrollExtent);
+    });
+
+    socket.on("sendGameMessage", (data) {
+      var message = jsonDecode(jsonEncode(data));
+      for (var i = 0; i < joinedRooms.length; i++) {
+        joinedRooms[i].messages?.add(ChatRoomMessage.fromJson(message));
+      }
+      joinedRooms.refresh();
+      if (scrollController.hasClients) {
+        Future.delayed(
+          Duration(milliseconds: 200),
+          () {
+            scrollController.animateTo(
+              scrollController.position.maxScrollExtent,
+              duration: Duration(milliseconds: 400),
+              curve: Curves.ease,
+            );
+          },
+        );
+      }
     });
   }
 
@@ -339,7 +358,7 @@ class ChatRoomController extends GetxController {
     return false;
   }
 
-  Future joinChatroom(int id) async {
+  Future<bool> joinChatroom(int id) async {
     isJoining.value = true;
     try {
       final response =
@@ -356,16 +375,11 @@ class ChatRoomController extends GetxController {
         var chatroom = ChatRoom.fromJson(jsonDecode(response.body));
         var roomIndex =
             joinedRooms.indexWhere((element) => element.id == chatroom.id);
-        print(roomIndex);
-        if (roomIndex != -1) {
-          //joinedRooms[roomIndex] = chatroom;
-        } else {
+        if (roomIndex == -1) {
           joinedRooms.add(chatroom);
+          return true;
         }
-        // Get.toNamed('/chatroom', parameters: {
-        //   'name': jsonDecode(response.body)['name'],
-        //   'id': jsonDecode(response.body)['id'].toString(),
-        // });
+        return false;
       } else {
         // If the server did not return a 200 OK response,
         // then throw an exception.
@@ -394,6 +408,7 @@ class ChatRoomController extends GetxController {
         backgroundColor: Colors.red,
         snackPosition: SnackPosition.BOTTOM,
       );
+      return false;
     } finally {
       isJoining.value = false;
     }

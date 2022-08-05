@@ -22,12 +22,33 @@ class ChatPageScreen extends StatelessWidget {
       () => DefaultTabController(
         length: 2,
         child: Scaffold(
+          backgroundColor: Theme.of(context).primaryColor,
           appBar: AppBar(
             title: Text("Greet"),
             automaticallyImplyLeading: false,
-            centerTitle: true,
             elevation: 0,
             actions: [
+              InkWell(
+                onTap: () {
+                  Get.toNamed("/myprofile");
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: CircleAvatar(
+                    radius: 16,
+                    backgroundColor: Colors.white,
+                    child: CircleAvatar(
+                      backgroundColor: Colors.white,
+                      radius: 14,
+                      foregroundImage: profileController.user.value.avatar !=
+                              null
+                          ? NetworkImage(profileController.user.value.avatar!)
+                          : null,
+                      backgroundImage: AssetImage('assets/images/user.jpg'),
+                    ),
+                  ),
+                ),
+              ),
               IconButton(
                 icon: Icon(Icons.search),
                 onPressed: () {
@@ -35,28 +56,11 @@ class ChatPageScreen extends StatelessWidget {
                 },
               ),
             ],
-            leading: InkWell(
-              onTap: () {
-                Get.toNamed("/myprofile");
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CircleAvatar(
-                  radius: 20,
-                  backgroundColor: Colors.white,
-                  child: CircleAvatar(
-                    backgroundColor: Colors.white,
-                    radius: 18.0,
-                    foregroundImage: profileController.user.value.avatar != null
-                        ? NetworkImage(profileController.user.value.avatar!)
-                        : null,
-                    backgroundImage: AssetImage('assets/images/user.jpg'),
-                  ),
-                ),
-              ),
-            ),
             bottom: TabBar(
-              indicatorWeight: 5,
+              unselectedLabelColor: Colors.white60,
+              indicatorColor: Colors.grey.shade100,
+              indicatorPadding:
+                  EdgeInsets.symmetric(horizontal: 30, vertical: 0),
               tabs: <Widget>[
                 Tab(
                   child: Obx(
@@ -80,11 +84,21 @@ class ChatPageScreen extends StatelessWidget {
               ],
             ),
           ),
-          body: TabBarView(
-            children: [
-              ChatListScreen(),
-              FriendListScreen(),
-            ],
+          body: Container(
+            constraints: BoxConstraints.expand(),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+            ),
+            child: TabBarView(
+              children: [
+                ChatListScreen(),
+                FriendListScreen(),
+              ],
+            ),
           ),
         ),
       ),

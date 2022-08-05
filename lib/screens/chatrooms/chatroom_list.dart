@@ -14,6 +14,7 @@ class ChatroomListScreen extends StatelessWidget {
     chatRoomController.fetchChatRooms();
     chatRoomController.fetchMyChatRooms();
     chatRoomController.fetchJoinedChatRooms();
+    FocusManager.instance.primaryFocus?.unfocus();
 
     return Scaffold(
       floatingActionButton: FloatingActionButton(
@@ -105,8 +106,30 @@ class ChatroomListScreen extends StatelessWidget {
                                       "N/A"),
                               onTap: () {
                                 print(index);
-                                chatRoomController.joinChatroom(
-                                    chatRoomController.joinedRooms[index].id);
+                                chatRoomController
+                                    .joinChatroom(chatRoomController
+                                        .joinedRooms[index].id)
+                                    .then((value) {
+                                  if (value) {
+                                    Timer(Duration(milliseconds: 1), () {
+                                      DefaultTabController.of(context)
+                                          ?.animateTo(chatRoomController
+                                              .joinedRooms.length);
+                                    });
+                                  } else {
+                                    var roomIndex = chatRoomController
+                                        .joinedRooms
+                                        .indexWhere((element) =>
+                                            element.id ==
+                                            chatRoomController
+                                                .joinedRooms[index].id);
+                                    Timer(Duration(milliseconds: 1), () {
+                                      DefaultTabController.of(context)
+                                          ?.animateTo(roomIndex + 1);
+                                    });
+                                  }
+                                });
+                                ;
                               },
                             ),
                           );
@@ -153,9 +176,29 @@ class ChatroomListScreen extends StatelessWidget {
                                   chatRoomController.chatRooms[index].name ??
                                       "N/A"),
                               onTap: () {
-                                print(index);
-                                chatRoomController.joinChatroom(
-                                    chatRoomController.chatRooms[index].id);
+                                chatRoomController
+                                    .joinChatroom(
+                                        chatRoomController.chatRooms[index].id)
+                                    .then((value) {
+                                  if (value) {
+                                    Timer(Duration(milliseconds: 500), () {
+                                      DefaultTabController.of(context)
+                                          ?.animateTo(chatRoomController
+                                              .joinedRooms.length);
+                                    });
+                                  } else {
+                                    var roomIndex = chatRoomController
+                                        .joinedRooms
+                                        .indexWhere((element) =>
+                                            element.id ==
+                                            chatRoomController
+                                                .chatRooms[index].id);
+                                    Timer(Duration(milliseconds: 1), () {
+                                      DefaultTabController.of(context)
+                                          ?.animateTo(roomIndex + 1);
+                                    });
+                                  }
+                                });
                               },
                             ),
                           );
@@ -210,9 +253,35 @@ class ChatroomListScreen extends StatelessWidget {
                                       ListTile(
                                         title: Text("Join Chatroom"),
                                         onTap: () {
-                                          chatRoomController.joinChatroom(
-                                              chatRoomController
-                                                  .myChatRooms[index].id);
+                                          chatRoomController
+                                              .joinChatroom(chatRoomController
+                                                  .myChatRooms[index].id)
+                                              .then((value) {
+                                            if (value) {
+                                              Timer(Duration(milliseconds: 1),
+                                                  () {
+                                                DefaultTabController.of(context)
+                                                    ?.animateTo(
+                                                        chatRoomController
+                                                            .joinedRooms
+                                                            .length);
+                                              });
+                                            } else {
+                                              var roomIndex = chatRoomController
+                                                  .joinedRooms
+                                                  .indexWhere((element) =>
+                                                      element.id ==
+                                                      chatRoomController
+                                                          .myChatRooms[index]
+                                                          .id);
+                                              Timer(Duration(milliseconds: 1),
+                                                  () {
+                                                DefaultTabController.of(context)
+                                                    ?.animateTo(roomIndex + 1);
+                                              });
+                                            }
+                                          });
+                                          ;
                                         },
                                       ),
                                       ListTile(

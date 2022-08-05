@@ -18,7 +18,7 @@ class DiscoverScreen extends StatelessWidget {
           Card(
             child: Padding(
               padding:
-                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 32.0),
+                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
               child: ListTile(
                 leading: Icon(Icons.ice_skating),
                 trailing: Icon(Icons.chevron_right),
@@ -32,7 +32,7 @@ class DiscoverScreen extends StatelessWidget {
           Card(
             child: Padding(
               padding:
-                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 32.0),
+                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
               child: ListTile(
                 leading: Icon(Icons.logout),
                 trailing: Icon(Icons.chevron_right),

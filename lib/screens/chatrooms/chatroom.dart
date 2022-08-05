@@ -7,6 +7,7 @@ import 'package:greet_app/controllers/profile_controller.dart';
 import 'package:greet_app/models/Chatroom.dart';
 import 'package:greet_app/services/socket_api.dart';
 import 'package:greet_app/widgets/chat_bubble.dart';
+import 'package:greet_app/widgets/message_bar.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 
 class ChatroomScreen extends StatelessWidget {
@@ -49,6 +50,16 @@ class ChatroomScreen extends StatelessWidget {
                         "SYSTEM") {
                       type = 2;
                     }
+                    if (chatroomController
+                            .joinedRooms[room].messages![index].sender ==
+                        "GIFT") {
+                      type = 3;
+                    }
+                    if (chatroomController
+                            .joinedRooms[room].messages![index].sender ==
+                        "GAME") {
+                      type = 4;
+                    }
                     return ChatBubble(
                       user: chatroomController
                           .joinedRooms[room].messages![index].sender,
@@ -63,7 +74,7 @@ class ChatroomScreen extends StatelessWidget {
                   }),
             ),
           ),
-          MessageBar(
+          CustomMessageBar(
             actions: [
               PopupMenuButton(
                 position: PopupMenuPosition.over,

@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:chat_bubbles/chat_bubbles.dart';
 
@@ -12,10 +14,13 @@ class ChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return type == 2
-        ? Center(
-            child: Text(message,
-                style: TextStyle(color: Colors.orange, fontSize: 18)))
+    var color = {
+      2: Colors.blue,
+      3: Colors.pink,
+      4: Colors.purple,
+    };
+    return (type > 1)
+        ? Center(child: Text(message, style: TextStyle(color: color[type])))
         : Padding(
             padding: type == 2
                 ? EdgeInsets.all(0)

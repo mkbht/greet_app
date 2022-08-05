@@ -33,7 +33,13 @@ class ChatroomPageScreen extends StatelessWidget {
               tabs: () {
                 List<Widget> tabs = [];
                 tabs.add(Tab(
-                  child: Text("Chatrooms"),
+                  child: Row(
+                    children: [
+                      Icon(Icons.forum_outlined),
+                      Text("Chatrooms",
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                    ],
+                  ),
                 ));
                 chatRoomController.joinedRooms.forEach((room) {
                   tabs.add(Tab(
