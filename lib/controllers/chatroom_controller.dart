@@ -52,9 +52,12 @@ class ChatRoomController extends GetxController {
 
     socket.on("sendGameMessage", (data) {
       var message = jsonDecode(jsonEncode(data));
-      for (var i = 0; i < joinedRooms.length; i++) {
-        joinedRooms[i].messages?.add(ChatRoomMessage.fromJson(message));
-      }
+      var roomIndex = joinedRooms.indexWhere((room) => room.id == 50);
+      roomIndex == -1
+          ? null
+          : joinedRooms[roomIndex]
+              .messages
+              ?.add(ChatRoomMessage.fromJson(message));
       joinedRooms.refresh();
       if (scrollController.hasClients) {
         Future.delayed(

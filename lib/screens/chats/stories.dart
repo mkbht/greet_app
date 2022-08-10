@@ -1,70 +1,48 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:greet_app/controllers/story_controller.dart';
+import 'package:greet_app/models/Story.dart';
 import 'package:stories_for_flutter/stories_for_flutter.dart';
 
-class StoryScreen extends StatelessWidget {
-  const StoryScreen({super.key});
+class StoryList extends StatelessWidget {
+  const StoryList({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stories(
-        displayProgress: true,
-        storyItemList: [
-          // First group of stories
-          StoryItem(
-              name: "First Story",
-              thumbnail: NetworkImage(
-                "https://assets.materialup.com/uploads/82eae29e-33b7-4ff7-be10-df432402b2b6/preview",
-              ),
-              stories: [
-                // First story
-                Scaffold(
-                  body: Container(
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        fit: BoxFit.cover,
-                        image: NetworkImage(
-                          "https://wallpaperaccess.com/full/16568.png",
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                // Second story in first group
-                Scaffold(
-                  body: Center(
-                    child: Text(
-                      "Second story in first group !",
-                      style: TextStyle(
-                        color: Color(0xff777777),
-                        fontSize: 25,
-                      ),
-                    ),
-                  ),
-                ),
-              ]),
-          // Second story group
-          StoryItem(
-            name: "2nd",
-            thumbnail: NetworkImage(
-              "https://www.shareicon.net/data/512x512/2017/03/29/881758_cup_512x512.png",
-            ),
+    StoryController storyController = Get.find<StoryController>();
+    storyController.fetchStories();
+
+    var stories = storyController.stories;
+    print(stories);
+
+    return Stories(
+      displayProgress: true,
+      highLightColor: Colors.grey,
+      storyItemList: () {
+        List<StoryItem> storyItems = [];
+        stories.forEach((story) {
+          storyItems.add(StoryItem(
+            name: story.user!.username ?? "",
+            thumbnail: NetworkImage(story.user!.avatar ?? ''),
             stories: [
               Scaffold(
+                backgroundColor: Colors.blue,
                 body: Center(
                   child: Text(
-                    "That's it, Folks !",
+                    story.text ?? "",
+                    textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Color(0xff777777),
+                      color: Colors.white,
                       fontSize: 25,
                     ),
                   ),
                 ),
               ),
             ],
-          ),
-        ],
-      ),
+          ));
+        });
+        return storyItems;
+      }(),
     );
   }
 }
