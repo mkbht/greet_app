@@ -7,6 +7,7 @@ import 'package:greet_app/bindings/bindings.dart';
 import 'package:greet_app/screens/chatrooms/chatroom.dart';
 import 'package:greet_app/screens/chatrooms/chatroom_list.dart';
 import 'package:greet_app/screens/chatrooms/chatroom_page.dart';
+import 'package:greet_app/screens/chats/story_maker.dart';
 import 'package:greet_app/screens/dashboard.dart';
 import 'package:greet_app/screens/discover.dart';
 import 'package:greet_app/screens/edit_profile.dart';
@@ -57,6 +58,7 @@ class App extends StatelessWidget {
         GetPage(name: "/privatechat", page: () => PrivateChatScreen()),
         GetPage(name: "/icebreaker", page: () => IceBreakerScreen()),
         GetPage(name: "/chatroom", page: () => ChatroomScreen()),
+        GetPage(name: "/storymaker", page: () => StoryMakerScreen()),
       ],
     );
   }

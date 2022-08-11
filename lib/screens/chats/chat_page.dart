@@ -28,6 +28,12 @@ class ChatPageScreen extends StatelessWidget {
             automaticallyImplyLeading: false,
             elevation: 0,
             actions: [
+              IconButton(
+                icon: Icon(Icons.add_circle_outline),
+                onPressed: () {
+                  Get.toNamed("storymaker");
+                },
+              ),
               InkWell(
                 onTap: () {
                   Get.toNamed("/myprofile");

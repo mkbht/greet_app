@@ -209,6 +209,25 @@ class MyProfileScreen extends StatelessWidget {
                         ),
                       ),
                       Divider(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Text(
+                                  "Balance: ${profileController.user.value.balance ?? 0}"),
+                            ),
+                          ),
+                          Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Text(
+                                  "Gifts: ${profileController.user.value.gifts!.toList().length ?? 0}"),
+                            ),
+                          ),
+                        ],
+                      ),
                       Card(
                         child: ListTile(
                           onTap: () {

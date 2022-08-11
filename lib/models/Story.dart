@@ -5,7 +5,7 @@ class Story {
   final int id;
   final Profile? user;
   final String? text;
-  final int? image;
+  final String? image;
 
   Story({required this.id, this.user, this.text, this.image});
 

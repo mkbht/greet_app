@@ -4,6 +4,7 @@ import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:greet_app/controllers/privatechat_controller.dart';
+import 'package:greet_app/controllers/story_controller.dart';
 import 'package:greet_app/screens/chats/stories.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -14,11 +15,13 @@ class ChatListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     PrivatechatController privatechatController =
         Get.find<PrivatechatController>();
+    StoryController storyController = Get.find<StoryController>();
 
     return Obx(
       () => RefreshIndicator(
         onRefresh: () async {
           await privatechatController.fetchChatList();
+          await storyController.fetchStories();
         },
         child: SingleChildScrollView(
           physics: AlwaysScrollableScrollPhysics(),

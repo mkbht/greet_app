@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -58,5 +59,59 @@ class StoryController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  Future uploadStory(File image) async {
+    var request = http.MultipartRequest(
+        "POST", Uri.parse('${dotenv.env['API_URL']}/stories'));
+    request.headers['Authorization'] = 'Bearer ${storage.read("token")}';
+    request.files.add(await http.MultipartFile.fromPath('image', image.path));
+    request.send().then((response) {
+      http.Response.fromStream(response).then((onValue) {
+        try {
+          if (response.statusCode == 200) {
+            Get.snackbar(
+              "Success",
+              "Story uploaded successfully.",
+              icon: Icon(
+                Icons.check,
+                color: Colors.white,
+              ),
+              colorText: Colors.white,
+              backgroundColor: Colors.green,
+              snackPosition: SnackPosition.BOTTOM,
+            );
+            fetchStories();
+            Get.toNamed('dashboard');
+          } else {
+            // If the server did not return a 200 OK response,
+            // then throw an exception.
+            Get.snackbar(
+              "Error",
+              "Failed to load stories.",
+              icon: Icon(
+                Icons.error,
+                color: Colors.white,
+              ),
+              colorText: Colors.white,
+              backgroundColor: Colors.red,
+              snackPosition: SnackPosition.BOTTOM,
+            );
+          }
+        } catch (e) {
+          Get.snackbar(
+            "Error",
+            "Server error.",
+            icon: Icon(
+              Icons.error,
+              color: Colors.white,
+            ),
+            colorText: Colors.white,
+            backgroundColor: Colors.red,
+            snackPosition: SnackPosition.BOTTOM,
+          );
+        }
+      });
+    });
   }
 }

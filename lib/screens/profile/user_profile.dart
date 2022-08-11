@@ -257,16 +257,16 @@ class UserProfileScreen extends StatelessWidget {
                         ),
                       ),
                       Divider(),
-                      Card(
-                        child: ListTile(
-                          onTap: () {},
-                          leading: CircleAvatar(
-                            child: Icon(Icons.block),
-                          ),
-                          title: Text("Block User"),
-                          trailing: Icon(Icons.chevron_right),
-                        ),
-                      ),
+                      // Card(
+                      //   child: ListTile(
+                      //     onTap: () {},
+                      //     leading: CircleAvatar(
+                      //       child: Icon(Icons.block),
+                      //     ),
+                      //     title: Text("Block User"),
+                      //     trailing: Icon(Icons.chevron_right),
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),
